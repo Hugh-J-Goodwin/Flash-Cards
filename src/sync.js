@@ -69,7 +69,7 @@ export class SyncEngine {
   schedule(delay = 800) { clearTimeout(this.timer); if (this.store.owner) this.timer = setTimeout(() => this.run(), delay); }
   async run() {
     if (!this.store.owner || this.busy || this.store.error) return;
-    if (this.conflict) { this.report('Sync paused: resolve the conflicting versions in Sync & backups.'); return; }
+    if (this.conflict) { this.report('Sync paused: open Sign in to resolve conflicting versions.'); return; }
     const owner = this.store.owner, generation = this.generation;
     const current = () => generation === this.generation && owner === this.store.owner;
     this.busy = true;

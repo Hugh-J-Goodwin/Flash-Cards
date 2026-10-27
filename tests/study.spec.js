@@ -32,7 +32,7 @@ async function editCard(page,text){await page.locator('#edit-card').click();awai
 test('ratings update due queue and quiz history survives reload on a phone layout',async({page,context})=>{
  await seed(context,{legacy:library()});await backend(context,new Map());await page.goto('/');
  await page.locator('#review-mode').click();await page.locator('#flip').click();await page.locator('[data-rate=easy]').click();
- await expect(page.getByRole('heading',{name:'You’re all caught up'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'No cards due'})).toBeVisible();
  await page.locator('[data-tab=progress]').click();await expect(page.locator('.metric-grid article').nth(0)).toContainText('0');await expect(page.locator('.metric-grid article').nth(1)).toContainText('1');
  await page.locator('[data-tab=quizzes]').click();await page.locator('[data-run]').click();await page.locator('[data-answer="0"]').click();await page.locator('#quiz-next').click();await expect(page.getByRole('heading',{name:'1 / 1',exact:true})).toBeVisible();
  await page.locator('#finish-quiz').click();await page.locator('[data-tab=progress]').click();await expect(page.locator('.history-row')).toContainText('1 / 1 · 100%');
