@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {validate,empty,removeSubject,score} from './model.js';
+const library=()=>({subjects:[{id:'s',name:'Maths'},{id:'s2',name:'Science'}],topics:[{id:'t',name:'Algebra',subjectId:'s'},{id:'t2',name:'Cells',subjectId:'s2'}],cards:[{id:'c',topicId:'t',front:'2x=4',back:'2'},{id:'c2',topicId:'t2',front:'Cell',back:'Life'}],quizzes:[{id:'q',topicId:'t',title:'Basics',questions:[{prompt:'2+2?',options:['1','2','3','4'],correct:3}]}]});
+test('backup round trip preserves cards and quizzes',()=>assert.deepEqual(validate(JSON.parse(JSON.stringify(library()))),library()));
+test('rejects orphan records and unsafe image URLs',()=>{let d=library();d.cards[0].topicId='missing';assert.throws(()=>validate(d));d=library();d.cards[0].frontImage='javascript:alert(1)';assert.throws(()=>validate(d));});
+test('rejects invalid quiz answers and duplicate IDs',()=>{let d=library();d.quizzes[0].questions[0].correct=4;assert.throws(()=>validate(d));d=library();d.cards[0].id='s';assert.throws(()=>validate(d));});
+test('subject deletion removes children while preserving other subjects',()=>{let d=removeSubject(library(),'s');assert.equal(d.subjects.length,1);assert.equal(d.topics[0].id,'t2');assert.equal(d.cards[0].id,'c2');assert.equal(d.quizzes.length,0);assert.doesNotThrow(()=>validate(d));});
+test('quiz score distinguishes incorrect and unanswered questions',()=>{const qs=[{correct:1},{correct:2},{correct:0}];assert.equal(score(qs,[1,0]),1);assert.equal(score(qs,[1,2,0]),3);});
+test('empty library is valid',()=>assert.deepEqual(validate(empty()),empty()));
